@@ -1,0 +1,339 @@
+{
+    "version": "VERSION 1.0",
+    "results": {
+        "7ebZWviUfUA": [
+            {
+                "sentence": "YWRkIGNob3BwZWQgZ2FybGljIGFuZCBzYWx0IHRvIGEgYm93bA==",
+                "sentence_en": "add chopped garlic and salt to a bowl",
+                "timestamp": [
+                    4,
+                    146
+                ],
+                "gt_sentence": "YWRkIGZsb3VyIHN1Z2FyIGJha2luZyBwb3dkZXIgYW5kIHNhbHQ=",
+                "gt_sentence_en": "add flour sugar baking powder and salt"
+            },
+            {
+                "sentence": "YWRkIGZsb3VyIGFuZCBzYWx0IHRvIGEgYm93bA==",
+                "sentence_en": "add flour and salt to a bowl",
+                "timestamp": [
+                    146,
+                    172
+                ],
+                "gt_sentence": "c3RpciB0aGUgaW5ncmVkaWVudHMgdG9nZXRoZXI=",
+                "gt_sentence_en": "stir the ingredients together"
+            },
+            {
+                "sentence": "Y3V0IHRoZSB0b2Z1IGludG8gc21hbGwgcGllY2Vz",
+                "sentence_en": "cut the tofu into small pieces",
+                "timestamp": [
+                    172,
+                    236
+                ],
+                "gt_sentence": "bWVsdCBidXR0ZXIgaW4gdGhlIG92ZW4=",
+                "gt_sentence_en": "melt butter in the oven"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIHRvIHRoZSBib3ds",
+                "sentence_en": "add the vegetables to the bowl",
+                "timestamp": [
+                    236,
+                    458
+                ],
+                "gt_sentence": "d2FybSB1cCBtaWxr",
+                "gt_sentence_en": "warm up milk"
+            },
+            {
+                "sentence": "Y3V0IHRoZSBmaXNoIGludG8gc21hbGwgcGllY2Vz",
+                "sentence_en": "cut the fish into small pieces",
+                "timestamp": [
+                    458,
+                    780
+                ],
+                "gt_sentence": "YWRkIG1lbHRlZCBidXR0ZXIgdmFuaWxsYSBleHRyYWN0IGFuZCBvbmUgbGFyZ2UgZWdnIHRvIHRoZSBtaWxrIGFuZCBtaXggdGhlIGluZ3JlZGllbnRz",
+                "gt_sentence_en": "add melted butter vanilla extract and one large egg to the milk and mix the ingredients"
+            },
+            {
+                "sentence": "YWRkIHNvbWUgbGVtb24ganVpY2UgYW5kIGxlbW9uIGp1aWNlIHRvIHRoZSBib3ds",
+                "sentence_en": "add some lemon juice and lemon juice to the bowl",
+                "timestamp": [
+                    780,
+                    912
+                ],
+                "gt_sentence": "Y29tYmluZSB0aGUgbWlsayB3aXRoIHRoZSBmbG91cg==",
+                "gt_sentence_en": "combine the milk with the flour"
+            },
+            {
+                "sentence": "Y3V0IHRoZSB0b2Z1IGludG8gc21hbGwgcGllY2Vz",
+                "sentence_en": "cut the tofu into small pieces",
+                "timestamp": [
+                    912,
+                    1008
+                ],
+                "gt_sentence": "c3ByZWFkIHNvbWUgYnV0dGVyIG9uIHRoZSBwYW4=",
+                "gt_sentence_en": "spread some butter on the pan"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIGFuZCB3YXRlciB0byB0aGUgYm93bA==",
+                "sentence_en": "add the vegetables and water to the bowl",
+                "timestamp": [
+                    1008,
+                    1106
+                ],
+                "gt_sentence": "cG91ciBiYXR0ZXIgb24gdGhlIHBhbg==",
+                "gt_sentence_en": "pour batter on the pan"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIGFuZCB3YXRlciB0byB0aGUgcG90",
+                "sentence_en": "add the vegetables and water to the pot",
+                "timestamp": [
+                    1106,
+                    1190
+                ],
+                "gt_sentence": "ZmxpcCB0aGUgcGFuY2FrZQ==",
+                "gt_sentence_en": "flip the pancake"
+            }
+        ],
+        "9GIPE0aeVNI": [
+            {
+                "sentence": "YWRkIHNhbHQgcGVwcGVyIGdhcmxpYyBwb3dkZXIgYW5kIHN1Z2FyIHRvIGEgYm93bA==",
+                "sentence_en": "add salt pepper garlic powder and sugar to a bowl",
+                "timestamp": [
+                    8,
+                    66
+                ],
+                "gt_sentence": "d2hpc2sgYW4gZWdnIGFuZCBvbGl2ZSBvaWw=",
+                "gt_sentence_en": "whisk an egg and olive oil"
+            },
+            {
+                "sentence": "YWRkIHNvbWUgbGVtb24ganVpY2Ugb2xpdmUgb2lsIGFuZCBsZW1vbiBqdWljZSB0byB0aGUgYm93bA==",
+                "sentence_en": "add some lemon juice olive oil and lemon juice to the bowl",
+                "timestamp": [
+                    66,
+                    184
+                ],
+                "gt_sentence": "Y2hvcCBhIGxlbW9uIGFuZCB0YWtlIG91dCB0aGUgc2VlZHM=",
+                "gt_sentence_en": "chop a lemon and take out the seeds"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIHRvIHRoZSBib3dsIGFuZCBtaXg=",
+                "sentence_en": "add the vegetables to the bowl and mix",
+                "timestamp": [
+                    184,
+                    240
+                ],
+                "gt_sentence": "c3F1ZWV6ZSBzb21lIG11c3RhcmQgc2F1Y2UgZ3JvdW5kIHBlcHBlciBhbmQgc2VhIHNhbHQgaW50byB0aGUgYm93bA==",
+                "gt_sentence_en": "squeeze some mustard sauce ground pepper and sea salt into the bowl"
+            },
+            {
+                "sentence": "Y3V0IHRoZSB0b2Z1IGludG8gc21hbGwgcGllY2Vz",
+                "sentence_en": "cut the tofu into small pieces",
+                "timestamp": [
+                    240,
+                    466
+                ],
+                "gt_sentence": "Y3J1c2ggZ2FybGljIGFuZCBhZGQgaXQgdG8gdGhlIGJvd2w=",
+                "gt_sentence_en": "crush garlic and add it to the bowl"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIHRvIHRoZSBib3dsIGFuZCBtaXg=",
+                "sentence_en": "add the vegetables to the bowl and mix",
+                "timestamp": [
+                    466,
+                    522
+                ],
+                "gt_sentence": "YWRkIHNvbWUgcGFybWVzYW4gY2hlZXNlIGludG8gdGhlIGJvd2wgYW5kIG1peCB0aGVtIHdlbGw=",
+                "gt_sentence_en": "add some parmesan cheese into the bowl and mix them well"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIHRvIHRoZSBib3ds",
+                "sentence_en": "add the vegetables to the bowl",
+                "timestamp": [
+                    522,
+                    772
+                ],
+                "gt_sentence": "Y2hvcCBzb21lIGxldHR1Y2UgYW5kIGl0IGFkZCB0byB0aGUgYm93bA==",
+                "gt_sentence_en": "chop some lettuce and it add to the bowl"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIHRvIHRoZSBib3ds",
+                "sentence_en": "add the vegetables to the bowl",
+                "timestamp": [
+                    772,
+                    866
+                ],
+                "gt_sentence": "bWl4IHRoZSBsZXR0dWNlIHdpdGggdGhlIHNhdWNlIGRyZXNzaW5nIGFuZCBhZGQgcGFybWVzYW4gY2hlZXNl",
+                "gt_sentence_en": "mix the lettuce with the sauce dressing and add parmesan cheese"
+            },
+            {
+                "sentence": "ZnJ5IHRoZSB2ZWdldGFibGVz",
+                "sentence_en": "fry the vegetables",
+                "timestamp": [
+                    866,
+                    950
+                ],
+                "gt_sentence": "YWRkIHNvbWUgYnJlYWQgY3J1bWJzIHRvIHRoZSBzYWxhZA==",
+                "gt_sentence_en": "add some bread crumbs to the salad"
+            }
+        ],
+        "NjAtxfaLwCk": [
+            {
+                "sentence": "Y3V0IHRoZSBvbmlvbnMgaW50byBzbWFsbCBwaWVjZXM=",
+                "sentence_en": "cut the onions into small pieces",
+                "timestamp": [
+                    2,
+                    102
+                ],
+                "gt_sentence": "Y29tYmluZSBmbG91ciBzYWx0IGJha2luZyBwb3dkZXIgYW5kIHN1Z2FyIGluIGEgYm93bA==",
+                "gt_sentence_en": "combine flour salt baking powder and sugar in a bowl"
+            },
+            {
+                "sentence": "YWRkIGEgbGl0dGxlIGJpdCBvZiB3YXRlciBhbmQgbWl4IGl0IHdlbGw=",
+                "sentence_en": "add a little bit of water and mix it well",
+                "timestamp": [
+                    102,
+                    256
+                ],
+                "gt_sentence": "YmVhdCB0d28gZWdncyBpbnRvIHRoZSBtaWxrIGFuZCB3aGlzayBpbiBhIGN1cCBvZiBtZWx0ZWQgYnV0dGVy",
+                "gt_sentence_en": "beat two eggs into the milk and whisk in a cup of melted butter"
+            },
+            {
+                "sentence": "Y3V0IHRoZSBwb3JrIGludG8gc21hbGwgcGllY2Vz",
+                "sentence_en": "cut the pork into small pieces",
+                "timestamp": [
+                    256,
+                    526
+                ],
+                "gt_sentence": "c3RpciBpbiB0aGUgbWlsayBhbmQgYWRkIHZhbmlsbGEgZXh0cmFjdA==",
+                "gt_sentence_en": "stir in the milk and add vanilla extract"
+            },
+            {
+                "sentence": "ZHJhaW4gdGhlIHdhdGVyIGFuZCBjdXQgdGhlIHRvZnUgaW50byBzbWFsbCBwaWVjZXM=",
+                "sentence_en": "drain the water and cut the tofu into small pieces",
+                "timestamp": [
+                    526,
+                    594
+                ],
+                "gt_sentence": "c3ByZWFkIGJ1dHRlciBvbiB0aGUgZ3JpbGwgcGFu",
+                "gt_sentence_en": "spread butter on the grill pan"
+            },
+            {
+                "sentence": "ZHJhaW4gdGhlIHdhdGVyIGFuZCBwbGFjZSB0aGUgdmVnZXRhYmxlcyBvbiBhIHBhcGVyIHRvd2Vs",
+                "sentence_en": "drain the water and place the vegetables on a paper towel",
+                "timestamp": [
+                    594,
+                    878
+                ],
+                "gt_sentence": "cG91ciBiYXR0ZXIgb24gdGhlIHBhbg==",
+                "gt_sentence_en": "pour batter on the pan"
+            },
+            {
+                "sentence": "Y3V0IHRoZSB0b2Z1IGludG8gc21hbGwgcGllY2Vz",
+                "sentence_en": "cut the tofu into small pieces",
+                "timestamp": [
+                    878,
+                    932
+                ],
+                "gt_sentence": "c3ByZWFkIGJ1dHRlciBhbmQgbWFwbGUgc3lydXAgb24gdGhlIHBhbmNha2Vz",
+                "gt_sentence_en": "spread butter and maple syrup on the pancakes"
+            }
+        ],
+        "Jtusyjv7GiY": [
+            {
+                "sentence": "cHV0IHNvbWUgY2hvcHBlZCBvbmlvbnMgZ2FybGljIGFuZCBzYWx0IGluIGEgYm93bA==",
+                "sentence_en": "put some chopped onions garlic and salt in a bowl",
+                "timestamp": [
+                    2,
+                    118
+                ],
+                "gt_sentence": "aGVhdCBzb21lIGhvdCBkb2cgYnVucyBpbiBhIHBhbg==",
+                "gt_sentence_en": "heat some hot dog buns in a pan"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIHRvIHRoZSBib3dsIGFuZCBtaXggaXQgd2VsbA==",
+                "sentence_en": "add the vegetables to the bowl and mix it well",
+                "timestamp": [
+                    118,
+                    286
+                ],
+                "gt_sentence": "aGVhdCBzb21lIG9pbCBpbiBhIHBhbiBhbmQgZnJ5IHNvbWUgY2hpY2tlbiBzYXVzYWdlcyBpbiBpdA==",
+                "gt_sentence_en": "heat some oil in a pan and fry some chicken sausages in it"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIHRvIHRoZSBib3dsIGFuZCBtaXg=",
+                "sentence_en": "add the vegetables to the bowl and mix",
+                "timestamp": [
+                    286,
+                    366
+                ],
+                "gt_sentence": "cHV0IHRoZSBsZXR0dWNlIGFuZCBob3QgZG9ncyBpbiB0aGUgYnVucw==",
+                "gt_sentence_en": "put the lettuce and hot dogs in the buns"
+            },
+            {
+                "sentence": "ZnJ5IHRoZSB2ZWdldGFibGVz",
+                "sentence_en": "fry the vegetables",
+                "timestamp": [
+                    366,
+                    434
+                ],
+                "gt_sentence": "YWRkIG9uaW9uIGtldGNodXAgYW5kIG11c3RhcmQ=",
+                "gt_sentence_en": "add onion ketchup and mustard"
+            },
+            {
+                "sentence": "cGxhY2UgdGhlIG1lYXQgb24gdGhlIGdyaWxs",
+                "sentence_en": "place the meat on the grill",
+                "timestamp": [
+                    434,
+                    450
+                ],
+                "gt_sentence": "Y2xvc2UgdGhlIGJ1bg==",
+                "gt_sentence_en": "close the bun"
+            }
+        ],
+        "B1YQYS9BMdk": [
+            {
+                "sentence": "YWRkIGNob3BwZWQgb25pb25zIGFuZCBjaG9wcGVkIG9uaW9ucyB0byBhIGJvd2w=",
+                "sentence_en": "add chopped onions and chopped onions to a bowl",
+                "timestamp": [
+                    2,
+                    37
+                ],
+                "gt_sentence": "Y3V0IHRoZSBtZWF0IGF0IGEgc2xhbnQ=",
+                "gt_sentence_en": "cut the meat at a slant"
+            },
+            {
+                "sentence": "YWRkIHNvbWUgY2hvcHBlZCBvbmlvbnMgYW5kIGZyeSBpdCBpbiBhIGJvd2w=",
+                "sentence_en": "add some chopped onions and fry it in a bowl",
+                "timestamp": [
+                    37,
+                    111
+                ],
+                "gt_sentence": "Y3V0IHRoZSBmaXNoIHZlcnRpY2FsbHkgaW50byBzbGljZXM=",
+                "gt_sentence_en": "cut the fish vertically into slices"
+            },
+            {
+                "sentence": "YWRkIHNvbWUgZmxvdXIgYW5kIHNhbHQgdG8gdGhlIGJvd2w=",
+                "sentence_en": "add some flour and salt to the bowl",
+                "timestamp": [
+                    111,
+                    176
+                ],
+                "gt_sentence": "c2xpY2UgdGhlIGZpc2ggaG9yaXpvbnRhbGx5",
+                "gt_sentence_en": "slice the fish horizontally"
+            },
+            {
+                "sentence": "YWRkIHRoZSB2ZWdldGFibGVzIHRvIHRoZSBib3dsIGFuZCBtaXg=",
+                "sentence_en": "add the vegetables to the bowl and mix",
+                "timestamp": [
+                    176,
+                    236
+                ],
+                "gt_sentence": "YXJyYW5nZSB0aGUgc3VzaGkgaW4gYSByb3c=",
+                "gt_sentence_en": "arrange the sushi in a row"
+            }
+        ]
+    },
+    "external_data": {
+        "used": "true",
+        "details": "ay"
+    }
+}
