@@ -75,6 +75,11 @@ The results should be comparable with the results shown at Table 4 of the paper.
 
 You can evaluate this by converting generated caption file (`CHECKPOINT_PATH`) into csv format that [MIL-NCE](https://github.com/antoine77340/MIL-NCE_HowTo100M) requests. See [here](https://github.com/antoine77340/MIL-NCE_HowTo100M#zero-shot-evaluation-retrieval-on-msr-vtt-and-youcook2) for additional information.
 
+- How to access annotated ingredients?
+
+you can access [Here](https://github.com/misogil0116/svpc/tree/master/densevid_eval/yc2_data).
+The annotated ingredients are stored to the json files (see 'ingredients' keys).
+
 - How to dump the learned embedding?
 
 WIP
