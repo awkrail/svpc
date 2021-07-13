@@ -1,9 +1,7 @@
 import os
 import json
+import argparse
 from tqdm import tqdm
-"""
-extract ingredients and actions from generated/ground-truth recipes
-"""
 
 def extract_ingredients(result_dict, all_ingredient_dict):
     for method, result in result_dict.items():
@@ -61,11 +59,9 @@ def calculate_ingredient_f1(result_dict, all_ingredient_dict):
         print("-------------------------")
                     
 def construct_ingredient_dict():
-    root_dir = "/home/nishimura/research/recipe_generation/graph_youcook2_generator/proposed_recipe_generation/video_recipe_generator/captioning_model/densevid_eval/our_yc2_data/debugged_split"
+    root_dir = "densevid_eval/yc2_data"
     filenames = ["bosselut_yc2_train_anet_format.json", "bosselut_split_yc2_val_anet_format.json", "bosselut_split_yc2_test_anet_format.json"]
-
     all_ingredient_dict = set()
-
     for filename in filenames:
         with open(os.path.join(root_dir, filename), "r") as f:
             data = json.load(f)
@@ -77,23 +73,18 @@ def construct_ingredient_dict():
     return all_ingredient_dict
 
 if __name__ == "__main__":
-    # result まとめ
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model_name", type=str, required=True, help="model_name for ingredient prediction evaluation (e.g., vivt, viv)")
+    parser.add_argument("--caption_path", type=str, required=True, help="caption path")
+    args = parser.parse_args()
+
     result_dict = {}
-    
-    # gtのみ別処理
-    gt_dict = {
-            "gt" : "/home/nishimura/research/recipe_generation/graph_youcook2_generator/proposed_recipe_generation/video_recipe_generator/preprocess/split/bosselut_split_yc2_test_anet_format.json"
-            }
+    gt_dict = { "gt" : "densevid_eval/yc2_data/bosselut_split_yc2_test_anet_format.json" }
     with open(gt_dict["gt"], "r") as f:
         data = json.load(f)
-
-    
     all_ingredient_dict = construct_ingredient_dict()
-
     test_recipe_ids = list(data.keys())
-
     result_dict["gt"] = {}
-
     for recipe_id, annotation in data.items():
         sentences = annotation["sentences"]
         result_dict["gt"][recipe_id] = {}
@@ -101,24 +92,7 @@ if __name__ == "__main__":
         result_dict["gt"][recipe_id]["sentences"] = sentences
 
     # その他は同じ
-    filename_dict = {
-            "mart" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/captioning/outputs_2_5/mart/mart_best_greedy_pred_val.json",
-            "mart_w_ing" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/baselines/recurrent-transformer/features/model/w_ingredients_copy/mart_best_greedy_pred_val.json",
-            #"xl" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/captioning/outputs_2_5/xl/xl_best_greedy_pred_val.json",
-            "xl" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/outputs_2_5/xl/xl_tmp_greedy_pred_test.json",
-            "xl_w_ing" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/baselines/recurrent-transformer/features/model/w_ingredients_copy/xl_best_greedy_pred_val.json",
-            "video" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/captioning/outputs_2_5/video/video_best_greedy_pred_val.json",
-            "ingr" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/captioning/outputs_2_5/ingr/ingr_best_greedy_pred_val.json",
-            "copy" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/outputs_2_5/copy/copy_lambda_0.5_tau_0.5_best_greedy_pred_val.json",
-            "reasoning" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/outputs_2_5/reasoning/reasoning_best_greedy_pred_val.json",
-            "reason_copy" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/outputs_2_5/reason_copy/reason_copy_best_greedy_pred_val.json",
-            "repred" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/debbued_version/full_lambda_0.5_tau_0.5_test_greedy_pred_test.json"
-            #"repred" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/debbued_version_2/full_lambda_0.75_tau_0.5_test_greedy_pred_test.json",
-            #"lambda_025" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/proposed_method/full_lambda_0.25_tau_0.5_test_greedy_pred_test.json",
-            #"lambda_050" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/proposed_method/full_lambda_0.5_tau_0.5_test_greedy_pred_test.json",
-            #"lambda_1" : "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/proposed_method/full_lambda_1.0_tau_0.5_test_greedy_pred_test.json"
-            }
-    
+    filename_dict = { args.model_name : args.caption_path }
     for method, filename in filename_dict.items():
         result_dict[method] = {}
         with open(filename, "r") as f:

@@ -12,7 +12,7 @@ glove_path="./cache/${dset_name}_vocab_glove.pt"
 verb_glove_path="./cache/bosselut_${dset_name}_verb_vocab_glove.pt"
 
 echo "---------------------------------------------------------"
-echo ">>>>>>>> Running training on ${dset_name} dataset"
+echo ">>>>>>>> Running evaluating on ${dset_name} dataset (test set)"
 max_n_sen=12
 max_t_len=22  # including "BOS" and "EOS"
 max_v_len=100
