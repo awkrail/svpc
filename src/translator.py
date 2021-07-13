@@ -4,8 +4,6 @@ import torch
 import copy
 import torch.nn.functional as F
 
-from src.rtransformer.model import RecursiveTransformer, NonRecurTransformer, NonRecurTransformerUntied, TransformerXL
-from src.rtransformer.masked_transformer import MTransformer
 from src.rtransformer.beam_search import BeamSearch
 from src.rtransformer.recursive_caption_dataset import RecursiveCaptionDataset as RCDataset
 

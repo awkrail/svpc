@@ -37,9 +37,11 @@ bash scripts/build_vocab.sh /path/to/glove.6B.300d.txt
 
 The general training command is:
 ```
-bash scripts/train.sh DATASET_NAME MODEL_TYPE
+bash scripts/train.sh MODEL_TYPE TEMP_PARAM, LAMBDA_PARAM, CHECKPOINT_DIR, FEATURE_DIR, DURATION_DIR
 ```
 `MODEL_TYPE` can be one of `[vivt, viv, vi, v]`, see details below.
+`TEMP_PARAM` and `LAMBDA_PARAM` is a gumbel softmax temperature parameter and lambda parameter, respectively.
+`CHECKPOINT_DIR`, `FEATURE_DIR`, and `DURATION_DIR` is checkpoint directory, feature directory, and duration csv file path, respectively.
 
 | MODEL_TYPE         | Description                            |
 |--------------------|----------------------------------------|

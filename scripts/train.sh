@@ -9,12 +9,9 @@ v_feat_dir=$5 # /path/to/feature/
 dur_file=$6 # /path/to/duration_frame.csv
 
 data_dir="./densevid_eval/${dset_name}_data"
-#v_feat_dir="/mnt/LSTA5/data/common/recipe/youcook2/features/training"
-#dur_file="/mnt/LSTA5/data/common/recipe/youcook2/features/yc2/${dset_name}_duration_frame.csv"
 word2idx_path="./cache/${dset_name}_word2idx.json"
 glove_path="./cache/${dset_name}_vocab_glove.pt"
 verb_glove_path="./cache/bosselut_${dset_name}_verb_vocab_glove.pt"
-#model_path="/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/debbued_version/${model_type}_lambda_${lam}_tau_${temperature}"
 
 
 echo "---------------------------------------------------------"

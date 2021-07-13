@@ -19,7 +19,6 @@ from src.rtransformer.recursive_caption_dataset import \
     caption_collate, single_sentence_collate, prepare_batch_inputs
 from src.rtransformer.recursive_caption_dataset import RecursiveCaptionDataset as RCDataset
 from src.rtransformer.model import StateAwareRecursiveTransformer
-from src.rtransformer.masked_transformer import MTransformer
 from src.rtransformer.optimization import BertAdam, EMA
 from src.translator import Translator
 from src.translate import run_translate
