@@ -58,7 +58,7 @@ scripts/train.sh vivt 0.5 0.5 /path/to/model/checkpoint/ /path/to/features/ /pat
 
 2. Evaluate trained model on word-overlap evaluation (BLEU, METEOR, CIDEr-D, and ROUGE-L)
 ```
-scripts/test.sh MODEL_TYPE CHECKPOINT_PATH FEATURE_DIR DURATION_PATH
+scripts/eval_caption.sh MODEL_TYPE CHECKPOINT_PATH FEATURE_DIR DURATION_PATH
 ```
 Note that you should specify checkpoint file (`.chkpt`) for `CHECKPOINT_PATH`.
 Generated captions are saved at `/path/to/model/checkpoint/MODEL_TYPE_test_greedy_pred_test.json`
