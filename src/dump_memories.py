@@ -8,7 +8,6 @@ import time
 
 import random
 import numpy as np
-import pickle
 import os
 import json
 import subprocess
@@ -19,8 +18,7 @@ from torch.utils.data import DataLoader
 from src.rtransformer.recursive_caption_dataset import \
     caption_collate, single_sentence_collate, prepare_batch_inputs
 from src.rtransformer.recursive_caption_dataset import RecursiveCaptionDataset as RCDataset
-from src.rtransformer.model import RecursiveTransformer, NonRecurTransformer, NonRecurTransformerUntied, TransformerXL, StructureAwareRecursiveTransformer
-from src.rtransformer.masked_transformer import MTransformer
+from src.rtransformer.model import StateAwareRecursiveTransformer
 from src.rtransformer.optimization import BertAdam, EMA
 from src.translator import Translator
 from src.translate import run_translate
@@ -69,69 +67,59 @@ def compute_total_f1(n_correct, n_recall, n_precision):
     return { "recall" : recall, "precision" : precision, "f1" : f1 }
 
 
-def eval_epoch(model, validation_data, device, opt):
-    """The same setting as training, where ground-truth word x_{t-1}
-    is used to predict next word x_{t}, not realistic for real inference"""
-    model.eval()
-    step_entity_vector_dict = {}
+def eval_language_metrics(checkpoint, eval_data_loader, opt, model=None, eval_mode="test"):
+    """eval_mode can only be set to `val` here, as setting to `test` is cheating
+    0, run inference
+    1, Get METEOR, BLEU1-4, CIDEr scores
+    2, Get vocab size, sentence length
+    """
+    translator = Translator(opt, checkpoint, model=model)
+    json_res = run_translate(eval_data_loader, translator, opt=opt)
+    res_filepath = os.path.abspath(opt.save_model + "_test_greedy_pred_{}.json".format(eval_mode))
 
-    ent_correct = 0
-    ent_recall = 0
-    ent_precision = 0
+    # byte string to sentence
+    for json_key, json_data in json_res["results"].items():
+        for data in json_res["results"][json_key]:
+            data["sentence"] = data["sentence"].decode()
+    
+    save_json(json_res, res_filepath, save_pretty=True)
 
-    with torch.no_grad():
-        for batch in tqdm(validation_data, mininterval=2, desc="  Validation =>"):
-            # prepare data
-            batched_data = [prepare_batch_inputs(step_data, device=device, non_blocking=opt.pin_memory)
-                            for step_data in batch[0]]
-            input_ids_list = [e["input_ids"] for e in batched_data]
-            video_features_list = [e["video_feature"] for e in batched_data]
-            input_masks_list = [e["input_mask"] for e in batched_data]
-            token_type_ids_list = [e["token_type_ids"] for e in batched_data]
-            input_labels_list = [e["input_labels"] for e in batched_data]
+    if opt.dset_name == "anet":
+        reference_files_map = {
+            "val": [os.path.join(opt.data_dir, e) for e in
+                    ["anet_entities_val_1_para.json", "anet_entities_val_2_para.json"]],
+            "test": [os.path.join(opt.data_dir, e) for e in
+                     ["anet_entities_test_1_para.json", "anet_entities_test_2_para.json"]]}
+    else:  # yc2
+        reference_files_map = {"test": [os.path.join("yc2_data", "yc2_split_test_anet_format_para.json")]}
 
-            # ingredients
-            batch_step_num = batch[1]
-            ingr_input_ids = torch.LongTensor([e["ingr_ids"] for e in batch[3]]).cuda()
-            ingr_masks = torch.LongTensor([e["ingr_mask"] for e in batch[3]]).cuda()
-            ingr_sep_masks = torch.LongTensor([e["ingr_sep_mask"] for e in batch[3]]).cuda()
+    # COCO language evaluation
+    eval_references = reference_files_map[eval_mode]
+    lang_filepath = res_filepath.replace(".json", "_lang.json")
+    eval_cmd = ["python", "para-evaluate.py", "-s", res_filepath, "-o", lang_filepath,
+                "-v", "-r"] + eval_references
+    subprocess.call(eval_cmd, cwd=opt.eval_tool_dir)
 
-            # actions / alignments
-            alignments = [e.cuda() for e in batch[4]]
-            actions = [e.cuda() for e in batch[5]]
+    # basic stats
+    stat_filepath = res_filepath.replace(".json", "_stat.json")
+    eval_stat_cmd = ["python", "get_caption_stat.py", "-s", res_filepath, "-r",  eval_references[0],
+                     "-o", stat_filepath, "-v"]
+    subprocess.call(eval_stat_cmd, cwd=opt.eval_tool_dir)
 
-            # for pointer generator network
-            ingr_id_dict = [e["ingr_id_dict"] for e in batch[3]]
-            extra_zeros =  [len(e["oov_word_dict"]) for e in batch[3]]
+    # repetition evaluation
+    rep_filepath = res_filepath.replace(".json", "_rep.json")
+    eval_rep_cmd = ["python", "evaluateRepetition.py", "-s", res_filepath, "-r",  eval_references[0],
+                    "-o", rep_filepath]
+    subprocess.call(eval_rep_cmd, cwd=opt.eval_tool_dir)
 
-            memory_dict_list, entity_prob_list, action_prob_list = model(input_ids_list, video_features_list,
-                                                                         input_masks_list, token_type_ids_list, 
-                                                                         input_labels_list, ingr_input_ids,
-                                                                         ingr_masks, ingr_sep_masks, batch_step_num,
-                                                                         ingr_id_dict, extra_zeros,
-                                                                         alignments, actions, predict=True)
+    # save results
+    logger.info("Finished eval {}.".format(eval_mode))
+    metric_filepaths = [lang_filepath, stat_filepath, rep_filepath]
+    all_metrics = merge_dicts([load_json(e) for e in metric_filepaths])
 
-            for batch_idx in range(len(batch_step_num)):
-                step_num = batch_step_num[batch_idx]
-                memory_dict = memory_dict_list[batch_idx]
-                recipe_id = batch[2][batch_idx]["name"]
-                memory_dict["entity_probs"] = memory_dict["entity_probs"].detach().cpu()
-                memory_dict["entity_vectors"] = [memory_dict["entity_vectors"][0].detach().cpu(), memory_dict["entity_vectors"][1].detach().cpu()]
-                step_entity_vector_dict[recipe_id] = memory_dict
-
-            tmp_ent_correct, tmp_ent_recall, tmp_ent_precision = calculate_f1(entity_prob_list, alignments)
-            ent_correct += tmp_ent_correct
-            ent_recall += tmp_ent_recall
-            ent_precision += tmp_ent_precision
-
-    recall = ent_correct / ent_recall
-    precision = ent_correct / ent_precision
-    f1 = 2 * recall * precision / (recall + precision)
-    print("ent recall: ", recall)
-    print("ent precision: ", precision)
-    print("ent f1: ", f1)
-
-    return step_entity_vector_dict
+    all_metrics_filepath = res_filepath.replace(".json", "_all_metrics.json")
+    save_json(all_metrics, all_metrics_filepath, save_pretty=True)
+    return all_metrics, [res_filepath, all_metrics_filepath]
 
 
 def get_args():
@@ -177,10 +165,12 @@ def get_args():
     parser.add_argument("--full", action="store_true", help="Use full model")
     parser.add_argument("--reasoning", action="store_true", help="Use reasoning")
     parser.add_argument("--reason_copy", action="store_true", help="Use reasoning + copy")
+    parser.add_argument("--copy", action="store_true", help="Use only copy")
     parser.add_argument("--ingr", action="store_true", help="w/ only ingredients")
     parser.add_argument("--video", action="store_true", help="w/ only video")
     parser.add_argument("--temperature", type=float, default=0.5, help="gumbel softmax temperature")
     parser.add_argument("--lam", type=float, default=0.5, help="reprediction weight")
+    parser.add_argument("--use_asl", type=str, default="asl", help="use asl")
 
     parser.add_argument("--xl", action="store_true", help="transformer xl model, when specified, "
                                                           "will automatically set recurrent = True, "
@@ -284,12 +274,10 @@ def main():
 
     if opt.full:
         model_mode = "full"
-    elif opt.reasoning:
-        model_mode = "reasoning"
     elif opt.reason_copy:
         model_mode = "reason_copy"
-    elif opt.ingr:
-        model_mode = "ingr"
+    elif opt.copy:
+        model_mode = "copy"
     else:
         model_mode = "video"
 
@@ -300,7 +288,7 @@ def main():
 
     train_dataset = RCDataset(
         dset_name=opt.dset_name,
-        data_dir=opt.data_dir, video_feature_dir="/mnt/LSTA5/data/common/recipe/youcook2/features/training",
+        data_dir=opt.data_dir, video_feature_dir=os.path.join(opt.video_feature_dir, "training"),
         duration_file=opt.v_duration_file,
         word2idx_path=opt.word2idx_path, verb_word2idx_path=opt.verb2idx_path, 
         max_t_len=opt.max_t_len, max_v_len=opt.max_v_len, max_n_sen=opt.max_n_sen, max_i_len=opt.max_i_len,
@@ -308,17 +296,13 @@ def main():
     # add 10 at max_n_sen to make the inference stage use all the segments
     val_dataset = RCDataset(
         dset_name=opt.dset_name,
-        data_dir=opt.data_dir, video_feature_dir="/mnt/LSTA5/data/common/recipe/youcook2/features/validation",
+        data_dir=opt.data_dir, video_feature_dir=os.path.join(opt.video_feature_dir, "validation"), # test samples are from validation set of the original YouCook2 dataset
         duration_file=opt.v_duration_file,
         word2idx_path=opt.word2idx_path, verb_word2idx_path=opt.verb2idx_path, 
         max_t_len=opt.max_t_len, max_v_len=opt.max_v_len, max_n_sen=opt.max_n_sen+10, max_i_len=opt.max_i_len,
         mode="test", recurrent=opt.recurrent, untied=opt.untied or opt.mtrans)
 
-    if opt.recurrent or opt.ours:
-        collate_fn = caption_collate
-    else:  # single sentence (including untied)
-        collate_fn = single_sentence_collate
-
+    collate_fn = caption_collate
     train_loader = DataLoader(train_dataset, collate_fn=collate_fn,
                               batch_size=opt.batch_size, shuffle=True,
                               num_workers=opt.num_workers, pin_memory=opt.pin_memory)
@@ -347,6 +331,7 @@ def main():
         model_mode=model_mode,    # for ablation study
         temperature=opt.temperature, # temperature
         lambda_=opt.lam, # lambda
+        use_asl=opt.use_asl,
         type_vocab_size=opt.type_vocab_size,
         unk_id=train_loader.dataset.word2idx["[UNK]"],
         layer_norm_eps=opt.layer_norm_eps,  # bert layernorm
@@ -361,10 +346,8 @@ def main():
         share_wd_cls_weight=opt.share_wd_cls_weight
     )
 
-    if opt.recurrent:
-        if opt.ours:
-            logger.info("Use step-denendency model - Ours")
-            model = StructureAwareRecursiveTransformer(rt_config)
+    logger.info("Use step-denendency model - Ours")
+    model = StateAwareRecursiveTransformer(rt_config)
 
     if opt.glove_path is not None:
         if hasattr(model, "ingredient_embeddings") and hasattr(model, "text_embeddings") and hasattr(model.reasoner, "action_embeddings"):
@@ -380,7 +363,7 @@ def main():
                     torch.from_numpy(torch.load(opt.verb_glove_path)).float(), freeze=opt.freeze_glove)
                 model.recipe_reasoner.set_pretrained_embedding(
                     torch.from_numpy(torch.load(opt.verb_glove_path)).float(), freeze=opt.freeze_glove)
-            elif model_mode == "reasoning" or model_mode == "reason_copy":
+            elif model_mode == "reason_copy":
                 model.reasoner.set_pretrained_embedding(
                     torch.from_numpy(torch.load(opt.verb_glove_path)).float(), freeze=opt.freeze_glove)
 
@@ -395,21 +378,13 @@ def main():
     if hasattr(model, "embeddings") and hasattr(model.embeddings, "word_embeddings"):
         count_parameters(model.embeddings.word_embeddings)
 
-    if model_mode == "full":
-        checkpoint = torch.load("/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/debbued_version/full_lambda_0.5_tau_0.5.chkpt")
-    elif model_mode == "reason_copy":
-        checkpoint = torch.load("/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/outputs_2_5/reasoning/reasoning.chkpt")
-    elif model_mode == "reasoning":
-        checkpoint = torch.load("/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/outputs_2_5/reason_copy/reason_copy.chkpt")
-
+    filename = opt.save_model
+    checkpoint = torch.load(filename)
     model.load_state_dict(checkpoint["model"])
     model.cuda()
     model.eval()
 
-    step_entity_vector_dict = eval_epoch(model, val_loader, device, opt)
-    with open("ordering_eval/" + model_mode + "_step_emebedding_dict.pkl", "wb") as f:
-        pickle.dump(step_entity_vector_dict, f)
-
+    step_embeddings = eval_language_metrics(checkpoint, val_loader, opt, eval_mode="test", model=model)
 
 if __name__ == "__main__":
     main()
