@@ -68,14 +68,15 @@ This file is used for ingredient prediction evaluation.
 ```
 scripts/eval_ingredient_f1.sh MODEL_TYPE CAPTION_PATH
 ```
-`CAPTION_PATH` corresponds to the output file `/path/to/model/checkpoint/MODEL_TYPE_test_greedy_pred_test.json`.
 The results should be comparable with the results shown at Table 4 of the paper. 
 
 ## Questions
 - How to evaluate retrieval evaluation?
+
 You can evaluate this by converting generated caption file (`CHECKPOINT_PATH`) into csv format that [MIL-NCE](https://github.com/antoine77340/MIL-NCE_HowTo100M) requests. See [here](https://github.com/antoine77340/MIL-NCE_HowTo100M#zero-shot-evaluation-retrieval-on-msr-vtt-and-youcook2) for additional information.
 
 - How to dump the learned embedding?
+
 WIP
 
 ## Citation
