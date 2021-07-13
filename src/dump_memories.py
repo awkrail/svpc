@@ -5,6 +5,7 @@ This script handles the training process.
 import argparse
 import math
 import time
+import pickle
 
 import random
 import numpy as np
@@ -29,98 +30,49 @@ from tensorboardX import SummaryWriter
 import logging
 logger = logging.getLogger(__name__)
 
-def cal_performance(pred, gold):
-    pred = pred.max(2)[1].contiguous().view(-1)
-    gold = gold.contiguous().view(-1)
-    valid_label_mask = gold.ne(RCDataset.IGNORE)
-    pred_correct_mask = pred.eq(gold)
-    n_correct = pred_correct_mask.masked_select(valid_label_mask).sum().item()
-    return n_correct
+def dump_memories(model, validation_data, device, opt, eval_mode="test"):
+    model.eval()
+    step_entity_vector_dict = {}
+    with torch.no_grad():
+        for batch in tqdm(validation_data, mininterval=2, desc="  Validation =>"):
+            batched_data = [prepare_batch_inputs(step_data, device=device, non_blocking=opt.pin_memory)
+                            for step_data in batch[0]]
+            input_ids_list = [e["input_ids"] for e in batched_data]
+            video_features_list = [e["video_feature"] for e in batched_data]
+            input_masks_list = [e["input_mask"] for e in batched_data]
+            token_type_ids_list = [e["token_type_ids"] for e in batched_data]
+            input_labels_list = [e["input_labels"] for e in batched_data]
 
-def calculate_f1(prob_list, golds):
-    n_correct, n_recall, n_precision = 0, 0, 0
-    for prob, gold in zip(prob_list, golds):
-        p_pred = (prob > 0.5).flatten()
-        gold = gold.flatten()
+            # ingredients
+            batch_step_num = batch[1]
+            ingr_input_ids = torch.LongTensor([e["ingr_ids"] for e in batch[3]]).cuda()
+            ingr_masks = torch.LongTensor([e["ingr_mask"] for e in batch[3]]).cuda()
+            ingr_sep_masks = torch.LongTensor([e["ingr_sep_mask"] for e in batch[3]]).cuda()
 
-        n_correct += gold[p_pred].sum().item()
-        n_recall += gold.sum().item()
-        n_precision += p_pred.sum().item()
-    return n_correct, n_recall, n_precision    
+            # actions / alignments
+            alignments = [e.cuda() for e in batch[4]]
+            actions = [e.cuda() for e in batch[5]]
 
-def compute_total_f1(n_correct, n_recall, n_precision):
-    if n_recall == 0:
-        recall = 0
-    else:
-        recall = n_correct / n_recall
+            # for pointer generator network
+            ingr_id_dict = [e["ingr_id_dict"] for e in batch[3]]
+            extra_zeros =  [len(e["oov_word_dict"]) for e in batch[3]]
 
-    if n_precision == 0:
-        precision = 0
-    else:
-        precision = n_correct / n_precision
+            memory_dict_list, entity_prob_list, action_prob_list = model(input_ids_list, video_features_list,
+                                                                          input_masks_list, token_type_ids_list,
+                                                                          input_labels_list, ingr_input_ids,
+                                                                          ingr_masks, ingr_sep_masks, batch_step_num,
+                                                                          ingr_id_dict, extra_zeros,
+                                                                          alignments, actions, predict=True)
 
-    if recall == 0 and precision == 0:
-        f1 = 0
-    else:
-        f1 = 2 * (recall * precision) / (recall + precision)
-
-    return { "recall" : recall, "precision" : precision, "f1" : f1 }
-
-
-def eval_language_metrics(checkpoint, eval_data_loader, opt, model=None, eval_mode="test"):
-    """eval_mode can only be set to `val` here, as setting to `test` is cheating
-    0, run inference
-    1, Get METEOR, BLEU1-4, CIDEr scores
-    2, Get vocab size, sentence length
-    """
-    translator = Translator(opt, checkpoint, model=model)
-    json_res = run_translate(eval_data_loader, translator, opt=opt)
-    res_filepath = os.path.abspath(opt.save_model + "_test_greedy_pred_{}.json".format(eval_mode))
-
-    # byte string to sentence
-    for json_key, json_data in json_res["results"].items():
-        for data in json_res["results"][json_key]:
-            data["sentence"] = data["sentence"].decode()
-    
-    save_json(json_res, res_filepath, save_pretty=True)
-
-    if opt.dset_name == "anet":
-        reference_files_map = {
-            "val": [os.path.join(opt.data_dir, e) for e in
-                    ["anet_entities_val_1_para.json", "anet_entities_val_2_para.json"]],
-            "test": [os.path.join(opt.data_dir, e) for e in
-                     ["anet_entities_test_1_para.json", "anet_entities_test_2_para.json"]]}
-    else:  # yc2
-        reference_files_map = {"test": [os.path.join("yc2_data", "yc2_split_test_anet_format_para.json")]}
-
-    # COCO language evaluation
-    eval_references = reference_files_map[eval_mode]
-    lang_filepath = res_filepath.replace(".json", "_lang.json")
-    eval_cmd = ["python", "para-evaluate.py", "-s", res_filepath, "-o", lang_filepath,
-                "-v", "-r"] + eval_references
-    subprocess.call(eval_cmd, cwd=opt.eval_tool_dir)
-
-    # basic stats
-    stat_filepath = res_filepath.replace(".json", "_stat.json")
-    eval_stat_cmd = ["python", "get_caption_stat.py", "-s", res_filepath, "-r",  eval_references[0],
-                     "-o", stat_filepath, "-v"]
-    subprocess.call(eval_stat_cmd, cwd=opt.eval_tool_dir)
-
-    # repetition evaluation
-    rep_filepath = res_filepath.replace(".json", "_rep.json")
-    eval_rep_cmd = ["python", "evaluateRepetition.py", "-s", res_filepath, "-r",  eval_references[0],
-                    "-o", rep_filepath]
-    subprocess.call(eval_rep_cmd, cwd=opt.eval_tool_dir)
-
-    # save results
-    logger.info("Finished eval {}.".format(eval_mode))
-    metric_filepaths = [lang_filepath, stat_filepath, rep_filepath]
-    all_metrics = merge_dicts([load_json(e) for e in metric_filepaths])
-
-    all_metrics_filepath = res_filepath.replace(".json", "_all_metrics.json")
-    save_json(all_metrics, all_metrics_filepath, save_pretty=True)
-    return all_metrics, [res_filepath, all_metrics_filepath]
-
+            for batch_idx in range(len(batch_step_num)):
+                step_num = batch_step_num[batch_idx]
+                memory_dict = memory_dict_list[batch_idx]
+                recipe_id = batch[2][batch_idx]["name"]
+                memory_dict["entity_probs"] = memory_dict["entity_probs"].detach().cpu()
+                memory_dict["entity_vectors"] = [memory_dict["entity_vectors"][0].detach().cpu(), memory_dict["entity_vectors"][1].detach().cpu()]
+                step_entity_vector_dict[recipe_id] = memory_dict
+            
+    return step_entity_vector_dict
 
 def get_args():
     """parse and preprocess cmd line args"""
@@ -384,7 +336,9 @@ def main():
     model.cuda()
     model.eval()
 
-    step_embeddings = eval_language_metrics(checkpoint, val_loader, opt, eval_mode="test", model=model)
+    step_embeddings = dump_memories(model, val_loader, device, opt)
+    with open("./" + model_mode + "_step_embedding_dict.pkl", "wb") as f:
+        pickle.dump(step_embeddings, f)
 
 if __name__ == "__main__":
     main()

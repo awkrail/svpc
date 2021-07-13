@@ -9,12 +9,12 @@
 #   yc2 training mode: $ bash scripts/train.sh yc2
 
 dset_name="yc2"
-model_type=$1  # [vivt, viv, vi, v]
+model_type=$1  # [vivt, viv]
 model_path=$2 # /path/to/checkpoint
 v_feat_dir=$3 # /path/to/feature/
 dur_file=$4 # /path/to/duration_frame.csv
 
-data_dir="./densevid_eval/our_${dset_name}_data"
+data_dir="./densevid_eval/${dset_name}_data"
 word2idx_path="./cache/${dset_name}_word2idx.json"
 glove_path="./cache/${dset_name}_vocab_glove.pt"
 verb_glove_path="./cache/bosselut_${dset_name}_verb_vocab_glove.pt"

@@ -70,6 +70,12 @@ scripts/eval_ingredient_f1.sh MODEL_TYPE CAPTION_PATH
 ```
 The results should be comparable with the results shown at Table 4 of the paper. 
 
+4. Dump the learned embedding of ingredients
+```
+scripts/dump_embeddings.sh MODEL_TYPE CHECKPOINT_PATH FEATURE_DIR DURATION_PATH
+```
+This script generates `./MODEL_TYPE_step_embedding_dict.pkl`, which consists of material embedding at each step.
+
 ## Questions
 - How to evaluate retrieval evaluation?
 
@@ -77,12 +83,8 @@ You can evaluate this by converting generated caption file (`CHECKPOINT_PATH`) i
 
 - How to access annotated ingredients?
 
-you can access [Here](https://github.com/misogil0116/svpc/tree/master/densevid_eval/yc2_data).
-The annotated ingredients are stored to the json files (see 'ingredients' keys).
-
-- How to dump the learned embedding?
-
-WIP
+you can access them [here](https://github.com/misogil0116/svpc/tree/master/densevid_eval/yc2_data).
+The annotated ingredients are stored to the json files (see `ingredients` keys).
 
 ## Citation
 If you use this code for your research, please cite our paper:
