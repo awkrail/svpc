@@ -23,19 +23,19 @@ max_v_len=100
 echo ">>>>>>>> Model type ${model_type}"
 echo "---------------------------------------------------------"
 extra_args=()
-if [[ ${model_type} == "vivt" ]]; then # w/ + reasoning + copy + repredict
+if [[ ${model_type} == "vivt" ]]; then # VIVT
     extra_args+=(--recurrent)
     extra_args+=(--ours)
     extra_args+=(--full)
-elif [[ ${model_type} == "viv" ]]; then # w/ reasoning + copy
+elif [[ ${model_type} == "viv" ]]; then # VIV
     extra_args+=(--recurrent)
     extra_args+=(--ours)
     extra_args+=(--reason_copy)
-elif [[ ${model_type} == "vi" ]]; then # w/ only copy
+elif [[ ${model_type} == "vi" ]]; then # VI
     extra_args+=(--recurrent)
     extra_args+=(--ours)
     extra_args+=(--copy)
-elif [[ ${model_type} == "v" ]]; then # w/o any modules
+elif [[ ${model_type} == "v" ]]; then # V
     extra_args+=(--recurrent)
     extra_args+=(--ours)
     extra_args+=(--video)

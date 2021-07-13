@@ -18,8 +18,7 @@ from torch.utils.data import DataLoader
 from src.rtransformer.recursive_caption_dataset import \
     caption_collate, single_sentence_collate, prepare_batch_inputs
 from src.rtransformer.recursive_caption_dataset import RecursiveCaptionDataset as RCDataset
-from src.rtransformer.model import RecursiveTransformer, NonRecurTransformer, NonRecurTransformerUntied, TransformerXL, StructureAwareRecursiveTransformer
-from src.rtransformer.masked_transformer import MTransformer
+from src.rtransformer.model import StateAwareRecursiveTransformer
 from src.rtransformer.optimization import BertAdam, EMA
 from src.translator import Translator
 from src.translate import run_translate
@@ -92,8 +91,7 @@ def eval_language_metrics(checkpoint, eval_data_loader, opt, model=None, eval_mo
             "test": [os.path.join(opt.data_dir, e) for e in
                      ["anet_entities_test_1_para.json", "anet_entities_test_2_para.json"]]}
     else:  # yc2
-        #reference_files_map = {"val": [os.path.join(opt.data_dir, "yc2_val_anet_format_para.json")]}
-        reference_files_map = {"test": [os.path.join("our_yc2_data", "split", "yc2_split_test_anet_format_para.json")]}
+        reference_files_map = {"test": [os.path.join("yc2_data", "yc2_split_test_anet_format_para.json")]}
 
     # COCO language evaluation
     eval_references = reference_files_map[eval_mode]
@@ -276,12 +274,10 @@ def main():
 
     if opt.full:
         model_mode = "full"
-    elif opt.reasoning:
-        model_mode = "reasoning"
     elif opt.reason_copy:
         model_mode = "reason_copy"
-    elif opt.ingr:
-        model_mode = "ingr"
+    elif opt.copy:
+        model_mode = "copy"
     else:
         model_mode = "video"
 
@@ -292,7 +288,7 @@ def main():
 
     train_dataset = RCDataset(
         dset_name=opt.dset_name,
-        data_dir=opt.data_dir, video_feature_dir="/mnt/LSTA5/data/common/recipe/youcook2/features/training",
+        data_dir=opt.data_dir, video_feature_dir=os.path.join(opt.video_feature_dir, "training"),
         duration_file=opt.v_duration_file,
         word2idx_path=opt.word2idx_path, verb_word2idx_path=opt.verb2idx_path, 
         max_t_len=opt.max_t_len, max_v_len=opt.max_v_len, max_n_sen=opt.max_n_sen, max_i_len=opt.max_i_len,
@@ -300,17 +296,13 @@ def main():
     # add 10 at max_n_sen to make the inference stage use all the segments
     val_dataset = RCDataset(
         dset_name=opt.dset_name,
-        data_dir=opt.data_dir, video_feature_dir="/mnt/LSTA5/data/common/recipe/youcook2/features/validation",
+        data_dir=opt.data_dir, video_feature_dir=os.path.join(opt.video_feature_dir, "validation"), # test samples are from validation set of the original YouCook2 dataset
         duration_file=opt.v_duration_file,
         word2idx_path=opt.word2idx_path, verb_word2idx_path=opt.verb2idx_path, 
         max_t_len=opt.max_t_len, max_v_len=opt.max_v_len, max_n_sen=opt.max_n_sen+10, max_i_len=opt.max_i_len,
         mode="test", recurrent=opt.recurrent, untied=opt.untied or opt.mtrans)
 
-    if opt.recurrent or opt.ours:
-        collate_fn = caption_collate
-    else:  # single sentence (including untied)
-        collate_fn = single_sentence_collate
-
+    collate_fn = caption_collate
     train_loader = DataLoader(train_dataset, collate_fn=collate_fn,
                               batch_size=opt.batch_size, shuffle=True,
                               num_workers=opt.num_workers, pin_memory=opt.pin_memory)
@@ -354,10 +346,8 @@ def main():
         share_wd_cls_weight=opt.share_wd_cls_weight
     )
 
-    if opt.recurrent:
-        if opt.ours:
-            logger.info("Use step-denendency model - Ours")
-            model = StructureAwareRecursiveTransformer(rt_config)
+    logger.info("Use step-denendency model - Ours")
+    model = StateAwareRecursiveTransformer(rt_config)
 
     if opt.glove_path is not None:
         if hasattr(model, "ingredient_embeddings") and hasattr(model, "text_embeddings") and hasattr(model.reasoner, "action_embeddings"):
@@ -373,7 +363,7 @@ def main():
                     torch.from_numpy(torch.load(opt.verb_glove_path)).float(), freeze=opt.freeze_glove)
                 model.recipe_reasoner.set_pretrained_embedding(
                     torch.from_numpy(torch.load(opt.verb_glove_path)).float(), freeze=opt.freeze_glove)
-            elif model_mode == "reasoning" or model_mode == "reason_copy":
+            elif model_mode == "reason_copy":
                 model.reasoner.set_pretrained_embedding(
                     torch.from_numpy(torch.load(opt.verb_glove_path)).float(), freeze=opt.freeze_glove)
 
@@ -388,25 +378,7 @@ def main():
     if hasattr(model, "embeddings") and hasattr(model.embeddings, "word_embeddings"):
         count_parameters(model.embeddings.word_embeddings)
 
-    model_root_dir = "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/proposed_method"
-    
-    if model_mode == "full":
-        root_dir = "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/debbued_version"
-        filename = "full_lambda_{}_tau_{}.chkpt".format(opt.lam, opt.temperature)
-        filename = os.path.join(root_dir, filename)
-    elif model_mode == "reason_copy":
-        root_dir = "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/debbued_version"
-        filename = os.path.join(root_dir, "reason_copy_lambda_0.5_tau_0.5_asl.chkpt")
-    elif model_mode == "copy":
-        filename = os.path.join(model_root_dir, "copy_lambda_0.5_tau_0.5.chkpt")
-    elif model_mode == "reasoning":
-        root_dir = "/mnt/LSTA5/data/nishimura/graph_youcook2_generator/proposed_method/new_split_captioning/debbued_version"
-        filename = os.path.join(root_dir, "reasoning_lambda_0.5_tau_0.5_asl.chkpt")
-    elif model_mode == "ingr":
-        filename = os.path.join(model_root_dir, "ingr_lambda_0.1_tau_0.1.chkpt")
-    else:
-        filename = os.path.join(model_root_dir, "video_lambda_0.1_tau_0.1.chkpt")
-
+    filename = opt.save_model
     checkpoint = torch.load(filename)
     model.load_state_dict(checkpoint["model"])
     model.cuda()

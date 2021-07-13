@@ -37,11 +37,11 @@ bash scripts/build_vocab.sh /path/to/glove.6B.300d.txt
 
 The general training command is:
 ```
-bash scripts/train.sh MODEL_TYPE TEMP_PARAM, LAMBDA_PARAM, CHECKPOINT_DIR, FEATURE_DIR, DURATION_DIR
+bash scripts/train.sh MODEL_TYPE TEMP_PARAM, LAMBDA_PARAM, CHECKPOINT_DIR, FEATURE_DIR, DURATION_PATH
 ```
 `MODEL_TYPE` can be one of `[vivt, viv, vi, v]`, see details below.
 `TEMP_PARAM` and `LAMBDA_PARAM` is a gumbel softmax temperature parameter and lambda parameter, respectively.
-`CHECKPOINT_DIR`, `FEATURE_DIR`, and `DURATION_DIR` is checkpoint directory, feature directory, and duration csv file path, respectively.
+`CHECKPOINT_DIR`, `FEATURE_DIR`, and `DURATION_DIR` is checkpoint directory, feature directory, and duration csv filepath, respectively.
 
 | MODEL_TYPE         | Description                            |
 |--------------------|----------------------------------------|
@@ -51,25 +51,23 @@ bash scripts/train.sh MODEL_TYPE TEMP_PARAM, LAMBDA_PARAM, CHECKPOINT_DIR, FEATU
 | v                  | Video                                  |
 
 
-To train full model:
+To train VIVT model:
 ```
-bash scripts/train.sh vivt 0.5 0.5 /path/to/model/checkpoint/ /path/to/features/ /path/to/duration_frame.csv
+scripts/train.sh vivt 0.5 0.5 /path/to/model/checkpoint/ /path/to/features/ /path/to/duration_frame.csv
 ```
 
-2. Generate captions 
+2. Evaluate trained model on word-overlap evaluation (BLEU, METEOR, CIDEr-D, and ROUGE-L)
 ```
-bash scripts/translate_greedy.sh anet_re_* val
+scripts/test.sh MODEL_TYPE CHECKPOINT_PATH FEATURE_DIR DURATION_PATH
 ```
-Replace `anet_re_*` with your own model directory name. 
-The generated captions are saved at `results/anet_re_*/greedy_pred_val.json`
+Note that you should specify checkpoint file (`.chkpt`) for `CHECKPOINT_PATH`.
+Generated captions are saved at `/path/to/model/checkpoint/MODEL_TYPE_test_greedy_pred_test.json`
 
-
-3. Evaluate generated captions
+3. Evaluate ingredient prediction evaluation
 ```
-bash scripts/eval.sh anet val results/anet_re_*/greedy_pred_val.json
+scripts/eval.sh anet val results/anet_re_*/greedy_pred_val.json
 ```
-The results should be comparable with the results we present at Table 2 of the paper. 
-E.g., B@4 10.33; R@4 5.18.
+The results should be comparable with the results shown at Table 4 of the paper. 
 
 ## Citation
 If you use this code for your research, please cite our paper:
