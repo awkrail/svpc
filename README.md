@@ -1,7 +1,7 @@
 State-aware Video Procedural Captioning
 =====
 PyTorch code and dataset for our ACM MM 2021 paper ["State-aware Video Procedural Captioning"]()
-by [Taichi Nishimura](https://misogil0116.github.io/nishimura/)
+by [Taichi Nishimura](https://misogil0116.github.io/nishimura/), Atsushi Hashimoto, Yoshitaka Ushiku, Hirotaka Kameko, and Shinsuke Mori.
 
 This paper proposes a novel approach to generate a procedural text from the clip sequence pre-segmented in an instructional video and material list.
 The essential difficulty is to convert such visual representations into textual representations; that is, a model should track the material states after manipulations to better associate the cross-modal relations.
@@ -28,13 +28,7 @@ tar -xvzf path/to/rt_yc2_feat.tar.gz
 ### Training and Inference
 We give examples on how to perform training and inference.
 
-0. Build Vocabulary
-```
-bash scripts/build_vocab.sh /path/to/glove.6B.300d.txt
-```
-
 1. Training
-
 The general training command is:
 ```
 bash scripts/train.sh MODEL_TYPE TEMP_PARAM, LAMBDA_PARAM, CHECKPOINT_DIR, FEATURE_DIR, DURATION_PATH
@@ -76,6 +70,9 @@ scripts/dump_embeddings.sh MODEL_TYPE CHECKPOINT_PATH FEATURE_DIR DURATION_PATH
 ```
 This script generates `./MODEL_TYPE_step_embedding_dict.pkl`, which consists of material embedding at each step.
 
+## Pretrained weights
+You can download them from [here](https://drive.google.com/drive/folders/1S25vBqh_9MDf5XCw8svqhs5xaCv06Ccn?usp=sharing)
+
 ## Questions
 - How to evaluate retrieval evaluation?
 
@@ -83,7 +80,7 @@ You can evaluate this by converting generated caption file (`CHECKPOINT_PATH`) i
 
 - How to access annotated ingredients?
 
-you can access them [here](https://github.com/misogil0116/svpc/tree/master/densevid_eval/yc2_data).
+You can access them [here](https://github.com/misogil0116/svpc/tree/master/densevid_eval/yc2_data).
 The annotated ingredients are stored to the json files (see `ingredients` keys).
 
 ## Citation
