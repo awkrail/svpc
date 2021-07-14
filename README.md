@@ -34,7 +34,7 @@ The general training command is:
 bash scripts/train.sh MODEL_TYPE TEMP_PARAM, LAMBDA_PARAM, CHECKPOINT_DIR, FEATURE_DIR, DURATION_PATH
 ```
 `MODEL_TYPE` can be one of `[vivt, viv, vi, v]`, see details below.
-`TEMP_PARAM` and `LAMBDA_PARAM` is a gumbel softmax temperature parameter and lambda parameter, respectively.
+`TEMP_PARAM` and `LAMBDA_PARAM` is a gumbel softmax temperature parameter and lambda parameter, respectively (`TEMP_PARAM=0.5` and `LAMBDA_PARAM=0.5` work well in our experiments).
 `CHECKPOINT_DIR`, `FEATURE_DIR`, and `DURATION_DIR` is checkpoint directory, feature directory, and duration csv filepath, respectively.
 
 | MODEL_TYPE         | Description                            |
