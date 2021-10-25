@@ -1,6 +1,6 @@
 State-aware Video Procedural Captioning
 =====
-PyTorch code and dataset for our ACM MM 2021 paper ["State-aware Video Procedural Captioning"]()
+PyTorch code and dataset for our ACM MM 2021 paper ["State-aware Video Procedural Captioning"](https://dl.acm.org/doi/abs/10.1145/3474085.3475322)
 by [Taichi Nishimura](https://misogil0116.github.io/nishimura/), Atsushi Hashimoto, Yoshitaka Ushiku, Hirotaka Kameko, and Shinsuke Mori.
 
 This paper proposes a novel approach to generate a procedural text from the clip sequence pre-segmented in an instructional video and material list.
@@ -90,6 +90,7 @@ If you use this code for your research, please cite our paper:
   title={State-aware Video Procedural Captioning},
   author={Taichi Nishimura and Atsushi Hashimoto and Yoshitaka Ushiku and Hirotaka Kameko and Shinsuke Mori},
   booktitle={ACMMM},
+  pages={1766--1774},
   year={2021}
 }
 ```
