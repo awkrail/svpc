@@ -19,10 +19,14 @@ cd svpc
 
 1. Prepare feature files
 
-Download features from the [YouCook2 page](http://youcook2.eecs.umich.edu/download)
+Download [features.tar.gz](https://drive.google.com/file/d/1T5COAiqhIgqKvHzzsY2bw29fSuX68E39/view?usp=sharing) from Google drive.
+The features/ directory stores ResNet + BN-Inception features for each video.
 ```
-wget http://youcook2.eecs.umich.edu/static/YouCookII/YouCookII.tar.gz
-tar -xvzf path/to/rt_yc2_feat.tar.gz 
+features
+├── testing
+├── training
+├── validation
+└── yc2
 ```
 
 ### Training and Inference
