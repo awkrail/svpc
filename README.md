@@ -3,11 +3,7 @@ State-aware Video Procedural Captioning
 PyTorch code and dataset for our ACM MM 2021 paper ["State-aware Video Procedural Captioning"](https://dl.acm.org/doi/abs/10.1145/3474085.3475322)
 by [Taichi Nishimura](https://misogil0116.github.io/nishimura/), Atsushi Hashimoto, Yoshitaka Ushiku, Hirotaka Kameko, and Shinsuke Mori.
 
-This paper proposes a novel approach to generate a procedural text from the clip sequence pre-segmented in an instructional video and material list.
-The essential difficulty is to convert such visual representations into textual representations; that is, a model should track the material states after manipulations to better associate the cross-modal relations.
-To achieve this, we propose a novel VPC method, which modifies an existing textual simulator for tracking material states as a visual simulator and incorporates it into a video captioning model.
-Our experimental results show the effectiveness of the proposed method, which outperforms state-of-the-art video captioning models.
-We further analyze the learned embedding of materials to demonstrate that the simulators capture their state transition.
+Video procedural captioning (VPC), which generates procedural text from instructional videos, is an essential task for scene understanding and real-world applications. The main challenge of VPC is to describe how to manipulate materials accurately. This paper focuses on this challenge by designing a new VPC task, generating a procedural text from the clip sequence of an instructional video and material list. In this task, the state of materials is sequentially changed by manipulations, yielding their state-aware visual representations (e.g., eggs are transformed into cracked, stirred, then fried forms). The essential difficulty is to convert such visual representations into textual representations; that is, a model should track the material states after manipulations to better associate the cross-modal relations. To achieve this, we propose a novel VPC method, which modifies an existing textual simulator for tracking material states as a visual simulator and incorporates it into a video captioning model. Our experimental results show the effectiveness of the proposed method, which outperforms state-of-the-art video captioning models. We further analyze the learned embedding of materials to demonstrate that the simulators capture their state transition.
 
 ## Getting started
 ### Prerequisites
